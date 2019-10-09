@@ -172,6 +172,9 @@ Strategy
     - since times differ between 595 and 750 measurements
 - join the measurements
 - join the layout data
+
+Assembling the complete, TIDY dataset
+=============================================================
 ```{r}
 data_595 %>% pivot_longer(-(1:2), names_to = "well", values_to = "A_595") -> data_595
 data_750 %>% pivot_longer(-(1:2), names_to = "well", values_to = "A_750") -> data_750
@@ -184,11 +187,27 @@ data <- left_join(data, layout)
 head(data)
 ```
 
-Now we want to produce a graph which hopefully will show that the 595/750 ratio for trials without DCPIP added do not change at all, while the trials with DCPIP added have a slightly negative slope, indicating that abs 595 is decreasing (reduction of DCPIP) relative to abs 750 (reference).
+Looking forward
+=============================================================
+Now this looks like a Tidy dataset!
 
-```{r}
+We want to produce a graph which hopefully will show that the 595/750 ratio for trials without DCPIP added do not change at all, while the trials with DCPIP added have a slightly negative slope, indicating that abs 595 is decreasing (reduction of DCPIP) relative to abs 750 (reference). We also want to compare pH 6.5 to 7.5.
+
+To do this we will need to:
+- Create an average time column (lubridate and dplyr)
+- Create a 595/750 ratio column (dplyr)
+- Split the name column into pH and DCPIP variables (dplyr)
+- Make a separate dataset for the standard curve
+
+```{r, include=FALSE}
 library(lubridate)
+data %>% 
+  select(Time.x) %>%
+  mutate(time = strftime(., format = "%T"))
 
+strtoi(as.difftime(data$Time.y, format = "%Y-%m-%d %H:%M:%S %Z", units = "mins"))
+[1] 60 45 30 90
 minute(strptime(data$Time.y, format = "%Y-%m-%d %T")) + second(strptime(data$Time.y, format = "%Y-%m-%d %T"))/60
+as.difftime(strftime(data$Time.y, format = "%H:%M:%S"))
 ```
 

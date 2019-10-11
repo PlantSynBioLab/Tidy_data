@@ -119,10 +119,13 @@ Getting the data into R
 Look at all of these missing values!
 Now we need to fill in column 1 
 ```{r}
-layout %>% rename(row = ...1) -> layout
+#rename weird columns
+layout %>% rename(row = ...1) -> layout 
 layout %>% rename(variable = ...14) -> layout
+#fill in rows
 layout %>% 
   fill(row) -> layout
+#pivot longer
 layout %>%
   pivot_longer(-c(row,variable), 
          names_to = "column", values_to = "values") -> layout
@@ -143,7 +146,8 @@ layout %>%
 
 Finally let's make a `well` variable combining `row` and `column`
 ```{r}
-layout$well <- paste0(layout$row, layout$column)
+layout %>% unite(row, column, col = "well", sep = "") -> layout
+#layout$well <- paste0(layout$row, layout$column)
 head(layout)
 ```
 
@@ -200,6 +204,9 @@ To do this we will need to:
 - Make a separate dataset for the standard curve
 
 ```{r, include=FALSE}
+
+data$A_595/data$A_750
+
 library(lubridate)
 data %>% 
   select(Time.x) %>%

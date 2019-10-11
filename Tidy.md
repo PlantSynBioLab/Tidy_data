@@ -178,10 +178,13 @@ Look at all of these missing values!
 Now we need to fill in column 1 
 
 ```r
-layout %>% rename(row = ...1) -> layout
+#rename weird columns
+layout %>% rename(row = ...1) -> layout 
 layout %>% rename(variable = ...14) -> layout
+#fill in rows
 layout %>% 
   fill(row) -> layout
+#pivot longer
 layout %>%
   pivot_longer(-c(row,variable), 
          names_to = "column", values_to = "values") -> layout
@@ -205,20 +208,21 @@ layout %>%
 Finally let's make a `well` variable combining `row` and `column`
 
 ```r
-layout$well <- paste0(layout$row, layout$column)
+layout %>% unite(row, column, col = "well", sep = "") -> layout
+#layout$well <- paste0(layout$row, layout$column)
 head(layout)
 ```
 
 ```
-# A tibble: 6 x 6
-  row   column `Well ID` Name         `Conc/Dil` well 
-  <chr> <chr>  <chr>     <chr>        <chr>      <chr>
-1 B     2      SPL1      6.5_CP       <NA>       B2   
-2 B     3      SPL1      6.5_CP       <NA>       B3   
-3 B     4      SPL1      6.5_CP       <NA>       B4   
-4 B     6      SPL2      6.5_CP+DCPIP <NA>       B6   
-5 B     7      SPL2      6.5_CP+DCPIP <NA>       B7   
-6 B     8      SPL2      6.5_CP+DCPIP <NA>       B8   
+# A tibble: 6 x 4
+  well  `Well ID` Name         `Conc/Dil`
+  <chr> <chr>     <chr>        <chr>     
+1 B2    SPL1      6.5_CP       <NA>      
+2 B3    SPL1      6.5_CP       <NA>      
+3 B4    SPL1      6.5_CP       <NA>      
+4 B6    SPL2      6.5_CP+DCPIP <NA>      
+5 B7    SPL2      6.5_CP+DCPIP <NA>      
+6 B8    SPL2      6.5_CP+DCPIP <NA>      
 ```
 
 
@@ -265,7 +269,7 @@ head(data)
 ```
 
 ```
-# A tibble: 6 x 13
+# A tibble: 6 x 11
   Time.x              `T° 595` well  A_595 timepoint Time.y             
   <dttm>                 <dbl> <chr> <dbl>     <dbl> <dttm>             
 1 1899-12-31 00:00:05     23.3 B2     1.18         1 1899-12-31 00:00:46
@@ -274,8 +278,8 @@ head(data)
 4 1899-12-31 00:00:05     23.3 B6     1.20         1 1899-12-31 00:00:46
 5 1899-12-31 00:00:05     23.3 B7     1.25         1 1899-12-31 00:00:46
 6 1899-12-31 00:00:05     23.3 B8     1.16         1 1899-12-31 00:00:46
-# … with 7 more variables: `T° 750` <dbl>, A_750 <dbl>, row <chr>,
-#   column <chr>, `Well ID` <chr>, Name <chr>, `Conc/Dil` <chr>
+# … with 5 more variables: `T° 750` <dbl>, A_750 <dbl>, `Well ID` <chr>,
+#   Name <chr>, `Conc/Dil` <chr>
 ```
 
 Looking forward
@@ -294,8 +298,8 @@ To do this we will need to:
 
 
 ```
-Error in parse(text = x, srcfile = src) : <text>:7:1: unexpected '['
-6: strtoi(as.difftime(data$Time.y, format = "%Y-%m-%d %H:%M:%S %Z", units = "mins"))
-7: [
-   ^
+Error in parse(text = x, srcfile = src) : <text>:10:1: unexpected '['
+9: strtoi(as.difftime(data$Time.y, format = "%Y-%m-%d %H:%M:%S %Z", units = "mins"))
+10: [
+    ^
 ```
